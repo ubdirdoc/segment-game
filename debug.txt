@@ -1,0 +1,4 @@
+1: /home/jcelerier/travail/segment-game/Assets/StreamingAssets
+2: /home/jcelerier/travail/segment-game/
+final: file:////home/jcelerier/travail/segment-game/
+file:////home/jcelerier/travail/segment-game/game/Game.segment
