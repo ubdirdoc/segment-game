@@ -287,6 +287,7 @@ namespace SEGMent.Json
                             rooms.SetItemSoundName(item.id, SanitizeSound(item.Sound.Path));
                         // if (item.Description.length > 0)
                         // todo rooms.SetItemDescription(item.id, "");
+                        rooms.SetItemStartFrame(item.id, item.Default);
 
                         for (int i = 0; i < item.Frames.Length; i++)
                         {
