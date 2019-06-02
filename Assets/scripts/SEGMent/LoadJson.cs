@@ -356,7 +356,7 @@ namespace SEGMent.Json
             foreach(var trans in game.Transitions)
             {
                 int? trans_id = null;
-                bool do_fade = trans.Fade != 0;
+                bool is_immediate = trans.Fade == 0;
                 switch(trans.Transition.Which)
                 {
                     case "SceneToScene":
@@ -372,7 +372,7 @@ namespace SEGMent.Json
 						        trans_id = rooms.CreateStateObjectSolutionTransition(
                                     source.id
                                     , target.id
-                                    , do_fade, false);
+                                    , is_immediate, false);
                                 break;
                             }
                             case "Text":
@@ -397,7 +397,7 @@ namespace SEGMent.Json
                                     , t.Riddle.Text.Question
                                     , solutions
                                     , wrong_answers
-                                    , t.Riddle.Text.UseStars, do_fade, false);
+                                    , t.Riddle.Text.UseStars, is_immediate, false);
                                 break;
                             }
                             case "Puzzle":
@@ -405,7 +405,7 @@ namespace SEGMent.Json
 						        trans_id = rooms.CreatePuzzleSolutionTransition(
                                     source.id
                                     , target.id
-                                    , do_fade, false);
+                                    , is_immediate, false);
 
                                 break;
                             }
@@ -425,7 +425,7 @@ namespace SEGMent.Json
                         trans_id = rooms.CreateClickableTransition(
                             source.scene.id, target.id
                             , itemBox(source.Pos, source.Size, source.scene)
-                            , do_fade, false);
+                            , is_immediate, false);
                         break;
                     }
                     case "ClickAreaToScene":
@@ -437,7 +437,7 @@ namespace SEGMent.Json
                         trans_id = rooms.CreateClickableTransition(
                             source.scene.id, target.id
                             , itemBox(source.Pos, source.Size, source.scene) 
-                            , do_fade, false);
+                            , is_immediate, false);
                         break;
                     }
                     case "GifToScene":
