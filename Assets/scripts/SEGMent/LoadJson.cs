@@ -31,8 +31,11 @@ namespace SEGMent.Json
         public float[] Size;
         public Sound Sound;
         public bool PuzzlePiece;
+        public int Z;
 
+        [NonSerialized]
         internal int id = -1;
+        [NonSerialized]
         internal Scene scene = null;
     }
 
@@ -46,8 +49,11 @@ namespace SEGMent.Json
         public Sound Sound;
         public int Default;
         public int[] Frames;
+        public int Z;
 
+        [NonSerialized]
         internal int id = -1;
+        [NonSerialized]
         internal Scene scene = null;
     }
 
@@ -58,8 +64,11 @@ namespace SEGMent.Json
         public float[] Pos;
         public float[] Size;
         public Sound Sound;
+        public int Z;
 
+        [NonSerialized]
         internal int id = -1;
+        [NonSerialized]
         internal Scene scene = null;
     }
     [System.Serializable]
@@ -69,8 +78,11 @@ namespace SEGMent.Json
         public float[] Pos;
         public float[] Size;
         public Sound Sound;
+        public int Z;
 
+        [NonSerialized]
         internal int id = -1;
+        [NonSerialized]
         internal Scene scene = null;
     }
     [System.Serializable]
@@ -82,8 +94,11 @@ namespace SEGMent.Json
         public Sound Sound;
         public string Text;
         public int Behaviour;
+        public int Z;
 
+        [NonSerialized]
         internal int id = -1;
+        [NonSerialized]
         internal Scene scene = null;
     }
 
@@ -105,6 +120,7 @@ namespace SEGMent.Json
         public BackClickArea[] BackClickAreas;
         public TextArea[] TextAreas;
 
+        [NonSerialized]
         internal int id = -1;
     }
 
@@ -222,10 +238,10 @@ namespace SEGMent.Json
 
         public void Load(string json, Player player)
         {
-            Game game = null;
-            
-            var myObject = JsonUtility.FromJson<Root>(json);
-            game = myObject.Document.Process;
+            int start = 80;
+            int end = 68;
+            string actual = json.Substring(start, json.Length - start - end);
+            Game game = JsonUtility.FromJson<Game>(actual);
 
             var rooms = new GameStructureRooms(player.GetInformationManager());
 
@@ -251,6 +267,10 @@ namespace SEGMent.Json
                     initialRoom = scene;
                 // TODO rooms.SetRoomDiaryEntry(id, rooms.Value.diaryItem, rooms.Value.newDiaryItemMustBeHighlighted);
 
+                // Sort all the items by Z
+                Array.Sort<Object>(scene.Objects, (x,y) => x.Z.CompareTo(y.Z));
+                Array.Sort<Gif>(scene.Gifs, (x,y) => x.Z.CompareTo(y.Z));
+
                 foreach (var item in scene.Objects)
                 {	
                     item.id = rooms.CreateItem(scene.id, itemBox(item.Pos, item.Size, scene));
@@ -271,7 +291,6 @@ namespace SEGMent.Json
                         {
                             rooms.SetItemIsPuzzle(item.id, true);
                         }
-
                     }
                 }
 
