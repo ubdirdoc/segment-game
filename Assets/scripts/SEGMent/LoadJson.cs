@@ -1,3 +1,9 @@
+/* Author : Jean-Michaël Celerier - 2018-2019
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ */
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -230,7 +236,7 @@ namespace SEGMent.Json
         BoundingBox itemBox(float[] pos, float[] size, Scene scene)
         {
         	return BoundingBox.FromRect(
-                pos, 
+                pos,
                 new float[] { size[0], size[1] * (scene.ImageSize[0] / scene.ImageSize[1]) }
             );
 
@@ -263,7 +269,7 @@ namespace SEGMent.Json
                 rooms.SetRoomDescription(scene.id, scene.StartText, scene.RepeatText);
 
                 // Types: 0 = default, 1 = initial, 2 = final, 3 = game over
-                if (scene.SceneType == 1) 
+                if (scene.SceneType == 1)
                     initialRoom = scene;
                 // TODO rooms.SetRoomDiaryEntry(id, rooms.Value.diaryItem, rooms.Value.newDiaryItemMustBeHighlighted);
 
@@ -272,7 +278,7 @@ namespace SEGMent.Json
                 Array.Sort<Gif>(scene.Gifs, (x,y) => x.Z.CompareTo(y.Z));
 
                 foreach (var item in scene.Objects)
-                {	
+                {
                     item.id = rooms.CreateItem(scene.id, itemBox(item.Pos, item.Size, scene));
                     item.scene = scene;
                     if (item.id != GameStructureRooms.CREATION_ERROR)
@@ -282,7 +288,7 @@ namespace SEGMent.Json
                         Debug.Log(item.Image);
                         rooms.SetItemBackgroundImageURL(item.id, item.Image);
                         if (item.Sound.Path.Length > 0)
-                        { 
+                        {
                             rooms.SetItemSoundName(item.id, SanitizeSound(item.Sound.Path));
                         }
                         // if (item.Description.length > 0)
@@ -384,7 +390,7 @@ namespace SEGMent.Json
                         var t = trans.Transition.SceneToScene;
                         var source = pathToScene[t.From];
                         var target = pathToScene[t.To];
-                        
+
                         switch(t.Riddle.Which)
                         {
                             case "Gif":
@@ -456,7 +462,7 @@ namespace SEGMent.Json
 
                         trans_id = rooms.CreateClickableTransition(
                             source.scene.id, target.id
-                            , itemBox(source.Pos, source.Size, source.scene) 
+                            , itemBox(source.Pos, source.Size, source.scene)
                             , is_immediate, false);
                         break;
                     }
@@ -476,7 +482,7 @@ namespace SEGMent.Json
                     rooms.SetTransitionSound(trans_id.Value, SanitizeSound(trans.Sound.Path));
                 }
             }
-            
+
             if(initialRoom != null)
             {
                 rooms.TeleportToRoom(initialRoom.id);
