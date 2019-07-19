@@ -1,9 +1,3 @@
-/* Author : Jean-Michaël Celerier - 2018-2019
- *
- * SPDX-License-Identifier: AGPL-3.0-or-later
- *
- */
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -37,11 +31,7 @@ namespace SEGMent.Json
         public float[] Size;
         public Sound Sound;
         public bool PuzzlePiece;
-        public int Z;
-
-        [NonSerialized]
         internal int id = -1;
-        [NonSerialized]
         internal Scene scene = null;
     }
 
@@ -55,13 +45,11 @@ namespace SEGMent.Json
         public Sound Sound;
         public int Default;
         public int[] Frames;
-        public int Z;
 
-        [NonSerialized]
         internal int id = -1;
-        [NonSerialized]
         internal Scene scene = null;
     }
+
 
     [System.Serializable]
     public class ClickArea
@@ -70,11 +58,8 @@ namespace SEGMent.Json
         public float[] Pos;
         public float[] Size;
         public Sound Sound;
-        public int Z;
 
-        [NonSerialized]
         internal int id = -1;
-        [NonSerialized]
         internal Scene scene = null;
     }
     [System.Serializable]
@@ -84,11 +69,8 @@ namespace SEGMent.Json
         public float[] Pos;
         public float[] Size;
         public Sound Sound;
-        public int Z;
 
-        [NonSerialized]
         internal int id = -1;
-        [NonSerialized]
         internal Scene scene = null;
     }
     [System.Serializable]
@@ -100,14 +82,19 @@ namespace SEGMent.Json
         public Sound Sound;
         public string Text;
         public int Behaviour;
-        public int Z;
 
-        [NonSerialized]
         internal int id = -1;
-        [NonSerialized]
         internal Scene scene = null;
     }
 
+    [System.Serializable]
+    public class TextBox
+    {
+        public string Text;
+        public float[] Pos;
+        public float[] Size;
+    }
+    
     [System.Serializable]
     public class Scene
     {
@@ -116,6 +103,9 @@ namespace SEGMent.Json
         public float[] Rect;
         public float[] ImageSize;
         public int SceneType;
+        public bool Sonar;
+        public string diaryItem;
+        public bool Highlight;
         public string StartText;
         public bool RepeatText;
         public string Image;
@@ -126,7 +116,6 @@ namespace SEGMent.Json
         public BackClickArea[] BackClickAreas;
         public TextArea[] TextAreas;
 
-        [NonSerialized]
         internal int id = -1;
     }
 
@@ -193,6 +182,7 @@ namespace SEGMent.Json
         public float[] Color;
         public Sound Sound;
         public TransitionImpl Transition;
+        public bool Unique;
     }
 
 
@@ -236,7 +226,7 @@ namespace SEGMent.Json
         BoundingBox itemBox(float[] pos, float[] size, Scene scene)
         {
         	return BoundingBox.FromRect(
-                pos,
+                pos, 
                 new float[] { size[0], size[1] * (scene.ImageSize[0] / scene.ImageSize[1]) }
             );
 
@@ -244,10 +234,11 @@ namespace SEGMent.Json
 
         public void Load(string json, Player player)
         {
-            int start = 80;
-            int end = 68;
-            string actual = json.Substring(start, json.Length - start - end);
-            Game game = JsonUtility.FromJson<Game>(actual);
+            Game game = null;
+            
+            var myObject = JsonUtility.FromJson<Root>(json);
+            Debug.Log(myObject);
+            game = myObject.Document.Process;
 
             var rooms = new GameStructureRooms(player.GetInformationManager());
 
@@ -267,18 +258,17 @@ namespace SEGMent.Json
                 rooms.SetRoomBackgroundImageURL(scene.id, scene.Image);
                 rooms.SetRoomBackgroundMusic(scene.id, SanitizeSound(scene.Ambience.Path), scene.Ambience.Repeat);
                 rooms.SetRoomDescription(scene.id, scene.StartText, scene.RepeatText);
+                // rooms.SetRoomDiaryEntry(scene.id, scene.diaryItem, scene.Highlight);
+                
+                //Check if a radar is needed in the scene
+                rooms.SetRadarOnOff(scene.id, scene.Sonar);
 
                 // Types: 0 = default, 1 = initial, 2 = final, 3 = game over
-                if (scene.SceneType == 1)
+                if (scene.SceneType == 1) 
                     initialRoom = scene;
-                // TODO rooms.SetRoomDiaryEntry(id, rooms.Value.diaryItem, rooms.Value.newDiaryItemMustBeHighlighted);
-
-                // Sort all the items by Z
-                Array.Sort<Object>(scene.Objects, (x,y) => x.Z.CompareTo(y.Z));
-                Array.Sort<Gif>(scene.Gifs, (x,y) => x.Z.CompareTo(y.Z));
 
                 foreach (var item in scene.Objects)
-                {
+                {	
                     item.id = rooms.CreateItem(scene.id, itemBox(item.Pos, item.Size, scene));
                     item.scene = scene;
                     if (item.id != GameStructureRooms.CREATION_ERROR)
@@ -288,7 +278,7 @@ namespace SEGMent.Json
                         Debug.Log(item.Image);
                         rooms.SetItemBackgroundImageURL(item.id, item.Image);
                         if (item.Sound.Path.Length > 0)
-                        {
+                        { 
                             rooms.SetItemSoundName(item.id, SanitizeSound(item.Sound.Path));
                         }
                         // if (item.Description.length > 0)
@@ -297,6 +287,7 @@ namespace SEGMent.Json
                         {
                             rooms.SetItemIsPuzzle(item.id, true);
                         }
+
                     }
                 }
 
@@ -312,7 +303,6 @@ namespace SEGMent.Json
                             rooms.SetItemSoundName(item.id, SanitizeSound(item.Sound.Path));
                         // if (item.Description.length > 0)
                         // todo rooms.SetItemDescription(item.id, "");
-                        rooms.SetItemStartFrame(item.id, item.Default);
 
                         for (int i = 0; i < item.Frames.Length; i++)
                         {
@@ -328,6 +318,7 @@ namespace SEGMent.Json
                                     rooms.AddItemSolutionState(item.id, i + 1);
                                     break;
                             }
+                            // i +=1;
                         }
                     }
                 }
@@ -382,7 +373,12 @@ namespace SEGMent.Json
             foreach(var trans in game.Transitions)
             {
                 int? trans_id = null;
-                bool is_immediate = trans.Fade == 0;
+                bool do_fade = trans.Fade != 0;
+
+                //Check if the transition should be made immediatly the second time - Vincent Casamayou - 2019 
+                bool isUnique = trans.Unique;
+                Debug.Log("Unique Transition is " + isUnique);
+
                 switch(trans.Transition.Which)
                 {
                     case "SceneToScene":
@@ -390,7 +386,7 @@ namespace SEGMent.Json
                         var t = trans.Transition.SceneToScene;
                         var source = pathToScene[t.From];
                         var target = pathToScene[t.To];
-
+                        
                         switch(t.Riddle.Which)
                         {
                             case "Gif":
@@ -398,7 +394,7 @@ namespace SEGMent.Json
 						        trans_id = rooms.CreateStateObjectSolutionTransition(
                                     source.id
                                     , target.id
-                                    , is_immediate, false);
+                                    , do_fade, false);
                                 break;
                             }
                             case "Text":
@@ -423,7 +419,7 @@ namespace SEGMent.Json
                                     , t.Riddle.Text.Question
                                     , solutions
                                     , wrong_answers
-                                    , t.Riddle.Text.UseStars, is_immediate, false);
+                                    , t.Riddle.Text.UseStars, do_fade, false);
                                 break;
                             }
                             case "Puzzle":
@@ -431,7 +427,7 @@ namespace SEGMent.Json
 						        trans_id = rooms.CreatePuzzleSolutionTransition(
                                     source.id
                                     , target.id
-                                    , is_immediate, false);
+                                    , do_fade, isUnique);
 
                                 break;
                             }
@@ -451,7 +447,7 @@ namespace SEGMent.Json
                         trans_id = rooms.CreateClickableTransition(
                             source.scene.id, target.id
                             , itemBox(source.Pos, source.Size, source.scene)
-                            , is_immediate, false);
+                            , do_fade, false);
                         break;
                     }
                     case "ClickAreaToScene":
@@ -462,8 +458,8 @@ namespace SEGMent.Json
 
                         trans_id = rooms.CreateClickableTransition(
                             source.scene.id, target.id
-                            , itemBox(source.Pos, source.Size, source.scene)
-                            , is_immediate, false);
+                            , itemBox(source.Pos, source.Size, source.scene) 
+                            , do_fade, false);
                         break;
                     }
                     case "GifToScene":
@@ -482,7 +478,7 @@ namespace SEGMent.Json
                     rooms.SetTransitionSound(trans_id.Value, SanitizeSound(trans.Sound.Path));
                 }
             }
-
+            
             if(initialRoom != null)
             {
                 rooms.TeleportToRoom(initialRoom.id);

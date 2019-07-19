@@ -1,6 +1,8 @@
 ﻿/* Author : Raphaël Marczak - 2016-2018
  * 
- * SPDX-License-Identifier: AGPL-3.0-or-later
+ * This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. 
+ * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/ 
+ * or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA. 
  * 
  */
 
@@ -37,6 +39,16 @@ namespace SEGMent
 		public void SetMap(GameStructureRooms map) 
 		{
 			m_map = map;
+		}
+
+		//Author - Vincent Casamayou - June 2019
+ 		//Get the state of the radar for the current Room
+		public bool GetRadarInfo()
+		{	
+			if (m_currentRoom != null){
+				return m_currentRoom.GetRadar();
+			}
+			return true;
 		}
 
 		public string GetCurrentRoomDescription ()

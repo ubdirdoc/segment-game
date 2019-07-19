@@ -1,6 +1,8 @@
 ﻿/* Author : Raphaël Marczak - 2016-2018
  * 
- * SPDX-License-Identifier: AGPL-3.0-or-later
+ * This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. 
+ * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/ 
+ * or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA. 
  * 
  */
 
@@ -33,6 +35,7 @@ namespace SEGMent {
 
 			m_timeInSec = 0f;
 			m_isStructureLoaded = false;
+
 		}
 
 		public void SetPlayerName(string playerName) {
@@ -41,6 +44,12 @@ namespace SEGMent {
 
 		public string GetPlayerName() {
 			return m_player.GetName();
+		}
+		
+		//Author - Vincent Casamayou - June 2019
+ 		//Get the state of the radar for the current Room
+		public bool GetCurrentRadar(){
+			return m_player.GetRadarInfo();
 		}
 
 		public int GetCurrentRoomID() {
@@ -62,6 +71,7 @@ namespace SEGMent {
 			m_isStructureLoaded = false;
 			m_loader.SetRootFileName(m_structureRootFileName);
 			m_loader.Load(m_player);
+
 
 			while (!m_loader.IsStructureLoaded()) {
 				yield return null;

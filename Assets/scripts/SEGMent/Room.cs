@@ -1,6 +1,8 @@
 ﻿/* Author : Raphaël Marczak - 2016-2018
  * 
- * SPDX-License-Identifier: AGPL-3.0-or-later
+ * This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. 
+ * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/ 
+ * or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA. 
  * 
  */
 
@@ -16,6 +18,8 @@ namespace SEGMent
 		private string m_backgroundImageURL = "";
 		private string m_backgroundSoundName = "";
 		private string m_roomDescription = "";
+
+		private bool m_radarOffState = true;
 
 		private bool m_descriptionMustBeRepeated = false;
 
@@ -70,6 +74,19 @@ namespace SEGMent
 
 		public void SetBackgroundImageURL (string url) {
 			m_backgroundImageURL = url;
+		}
+
+		//Author - Vincent Casamayou - June 2019
+ 		//Update the Radar
+		public void SetRadar(bool radar){
+			m_radarOffState = radar;
+		}
+
+		//Author - Vincent Casamayou - June 2019
+ 		//Return the state of the radar for the pipeline
+		public bool GetRadar()
+		{
+			return m_radarOffState;
 		}
 
 		public string GetBackgroundImageURL() {

@@ -1,9 +1,11 @@
 /* Author : Raphaël Marczak - 2016-2018
  * 
- * SPDX-License-Identifier: AGPL-3.0-or-later
+ * This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. 
+ * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/ 
+ * or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA. 
  * 
  */
-
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -12,6 +14,7 @@ namespace SEGMent
 	public class GameStructureRooms: GameStructure
 	{
 		public static int CREATION_ERROR = -1;
+		public GameObject MainCam;
 
 		private List<Room> m_rooms;
 		private List<Item> m_items;
@@ -63,6 +66,16 @@ namespace SEGMent
 			m_rooms[roomID].SetBackgroundSoundName(soundName, mustLoop);
 		}
 
+		//Author - Vincent Casamayou - June 2019
+ 		//Launch the pipeline to update Radar
+		public void SetRadarOnOff(int roomID, bool radar){
+			if (roomID >= m_rooms.Count){
+				return;
+			}
+
+			m_rooms[roomID].SetRadar(radar);
+		}
+
 		public void SetRoomDiaryEntry(int roomID, string diaryEntryName, bool mustBeHighlighted = false) {
 			if (roomID >= m_rooms.Count) {
 				return;
@@ -82,7 +95,7 @@ namespace SEGMent
 			
 			m_items.Add(itemToAdd);
 			
-			return itemToAdd.GetNodeID();
+			return itemToAdd.GetNodeID();	
 		}
 
 		public void SetItemBackgroundImageURL(int itemID, string imageURL) {
