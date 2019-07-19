@@ -1,3 +1,8 @@
+/* Author : Jean-Michaël Celerier - 2018-2019
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ *
+ */
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -31,7 +36,11 @@ namespace SEGMent.Json
         public float[] Size;
         public Sound Sound;
         public bool PuzzlePiece;
+        public int Z;
+
+        [NonSerialized]
         internal int id = -1;
+        [NonSerialized]
         internal Scene scene = null;
     }
 
@@ -45,11 +54,13 @@ namespace SEGMent.Json
         public Sound Sound;
         public int Default;
         public int[] Frames;
+        public int Z;
 
+        [NonSerialized]
         internal int id = -1;
+        [NonSerialized]
         internal Scene scene = null;
     }
-
 
     [System.Serializable]
     public class ClickArea
@@ -59,9 +70,14 @@ namespace SEGMent.Json
         public float[] Size;
         public Sound Sound;
 
+        public int Z;
+
+        [NonSerialized]
         internal int id = -1;
+        [NonSerialized]
         internal Scene scene = null;
     }
+
     [System.Serializable]
     public class BackClickArea
     {
@@ -69,10 +85,14 @@ namespace SEGMent.Json
         public float[] Pos;
         public float[] Size;
         public Sound Sound;
+        public int Z;
 
+        [NonSerialized]
         internal int id = -1;
+        [NonSerialized]
         internal Scene scene = null;
     }
+
     [System.Serializable]
     public class TextArea
     {
@@ -82,8 +102,11 @@ namespace SEGMent.Json
         public Sound Sound;
         public string Text;
         public int Behaviour;
+        public int Z;
 
+        [NonSerialized]
         internal int id = -1;
+        [NonSerialized]
         internal Scene scene = null;
     }
 
@@ -116,6 +139,7 @@ namespace SEGMent.Json
         public BackClickArea[] BackClickAreas;
         public TextArea[] TextAreas;
 
+        [NonSerialized]
         internal int id = -1;
     }
 
@@ -234,11 +258,10 @@ namespace SEGMent.Json
 
         public void Load(string json, Player player)
         {
-            Game game = null;
-            
-            var myObject = JsonUtility.FromJson<Root>(json);
-            Debug.Log(myObject);
-            game = myObject.Document.Process;
+            int start = 80;
+            int end = 68;
+            string actual = json.Substring(start, json.Length - start - end);
+            Game game = JsonUtility.FromJson<Game>(actual);
 
             var rooms = new GameStructureRooms(player.GetInformationManager());
 
@@ -318,7 +341,6 @@ namespace SEGMent.Json
                                     rooms.AddItemSolutionState(item.id, i + 1);
                                     break;
                             }
-                            // i +=1;
                         }
                     }
                 }
@@ -373,7 +395,7 @@ namespace SEGMent.Json
             foreach(var trans in game.Transitions)
             {
                 int? trans_id = null;
-                bool do_fade = trans.Fade != 0;
+                bool is_immediate = trans.Fade == 0;
 
                 //Check if the transition should be made immediatly the second time - Vincent Casamayou - 2019 
                 bool isUnique = trans.Unique;
@@ -394,7 +416,7 @@ namespace SEGMent.Json
 						        trans_id = rooms.CreateStateObjectSolutionTransition(
                                     source.id
                                     , target.id
-                                    , do_fade, false);
+                                    , is_immediate, false);
                                 break;
                             }
                             case "Text":
@@ -419,7 +441,7 @@ namespace SEGMent.Json
                                     , t.Riddle.Text.Question
                                     , solutions
                                     , wrong_answers
-                                    , t.Riddle.Text.UseStars, do_fade, false);
+                                    , t.Riddle.Text.UseStars, is_immediate, false);
                                 break;
                             }
                             case "Puzzle":
@@ -427,7 +449,7 @@ namespace SEGMent.Json
 						        trans_id = rooms.CreatePuzzleSolutionTransition(
                                     source.id
                                     , target.id
-                                    , do_fade, isUnique);
+                                    , is_immediate, isUnique);
 
                                 break;
                             }
@@ -447,7 +469,7 @@ namespace SEGMent.Json
                         trans_id = rooms.CreateClickableTransition(
                             source.scene.id, target.id
                             , itemBox(source.Pos, source.Size, source.scene)
-                            , do_fade, false);
+                            , is_immediate, false);
                         break;
                     }
                     case "ClickAreaToScene":
@@ -459,7 +481,7 @@ namespace SEGMent.Json
                         trans_id = rooms.CreateClickableTransition(
                             source.scene.id, target.id
                             , itemBox(source.Pos, source.Size, source.scene) 
-                            , do_fade, false);
+                            , is_immediate, false);
                         break;
                     }
                     case "GifToScene":
