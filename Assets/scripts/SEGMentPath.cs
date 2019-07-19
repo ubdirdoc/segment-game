@@ -1,6 +1,8 @@
 ﻿/* Author : Raphaël Marczak - 2016-2018
  * 
- * SPDX-License-Identifier: AGPL-3.0-or-later
+ * This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License. 
+ * To view a copy of this license, visit http://creativecommons.org/licenses/by-nc-sa/4.0/ 
+ * or send a letter to Creative Commons, PO Box 1866, Mountain View, CA 94042, USA. 
  * 
  */
 
@@ -9,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using UnityEngine;
+using UnityEngine.UI;
 
 
 
@@ -20,6 +23,7 @@ public class SEGMentPath : MonoBehaviour {
 	public string m_gameDataDirectoryName = "game/";
 	public string m_gameStructureRootFileName = "Game.segment";
 	public string m_applicationPath;
+	public bool m_mustUseStreamingAssets =  false;
 
 	public string m_soundDirectoryName = "Sounds/";
 	public string m_soundExtension = ".wav";
@@ -60,12 +64,16 @@ public class SEGMentPath : MonoBehaviour {
 
 	IEnumerator GeneratePath ()
     {
-        StreamWriter writer = new StreamWriter("./debug.txt", true);
+        // StreamWriter writer = new StreamWriter("./debug.txt", true);
         m_pathAreGenerated = false;
 
 		m_applicationPath = Application.streamingAssetsPath;
-        writer.WriteLine("1: " + m_applicationPath);
-        writer.Flush();
+        // writer.WriteLine("1: " + m_applicationPath);
+        // writer.Flush();
+
+		
+
+
 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
 		//	#if !UNITY_EDITOR
 		m_applicationPath = "file:///" + m_applicationPath;
@@ -82,20 +90,26 @@ public class SEGMentPath : MonoBehaviour {
 		if (testWWW.error != null) {
 
 			m_applicationPath = Path.GetFullPath (".") + "/";
-            writer.WriteLine("2: " + m_applicationPath);
-            writer.Flush();
+            // writer.WriteLine("2: " + m_applicationPath);
+            // writer.Flush();
 
 
 
 #if UNITY_ANDROID
 #if !UNITY_EDITOR
-		/*if (m_mustUseStreamingAssets) {
-		m_applicationPath = "jar:file://" + Application.dataPath + "!/assets/";
-		} else {*/
+		// if (m_mustUseStreamingAssets == true) {
+		// m_applicationPath = "jar:file:///" + Application.dataPath + "!/assets/";
+		
+		// // Objet UI Texte pour afficher la modification
+		// textdebug = GameObject.Find("Debug"): 
+		// debugString = textdebug.GetComponent<Text>();
+		// debugString.text = m_applicationPath;
+		
+		// } 
+		// else {
+		// m_applicationPath = "file://///storage/emulated/" + "/";
 		m_applicationPath = "file:////mnt/sdcard/data/SEGMent" + "/";
-		//}
-
-
+		// }c
 #endif
 #endif
 
@@ -110,7 +124,7 @@ public class SEGMentPath : MonoBehaviour {
 #if UNITY_WEBGL
 #if !UNITY_EDITOR
 		m_applicationPath = Application.absoluteURL.Substring(0, Application.absoluteURL.LastIndexOf("/")) + "/";
-		GenericLog.Log("WEB GL APP = " + m_applicationPath);
+		// GenericLog.Log("WEB GL APP = " + m_applicationPath);
 		//return;
 #else
 		m_applicationPath = "http://raphael.marczak.free.fr/SEGMentWebGLSmall/SEGMent/";
@@ -126,10 +140,10 @@ public class SEGMentPath : MonoBehaviour {
 
 		m_pathAreGenerated = true;
 
-        writer.WriteLine("final: " + m_applicationPath);
-        writer.Flush();
-        writer.WriteLine(GetSEGMentDiagramPath());
-        writer.Flush();
+        // writer.WriteLine("final: " + m_applicationPath);
+        // writer.Flush();
+        // writer.WriteLine(GetSEGMentDiagramPath());
+        // writer.Flush();
     }
 		
 
