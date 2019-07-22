@@ -499,6 +499,13 @@ public class Main : MonoBehaviour {
 			yield return null;
 		}
 
+		//Author - Vincent Casamayou - June 2019
+ 		//Check and Update the Radar
+		m_disableRadar = true;
+		Debug.Log("The Radar is " + m_SEGMentEngine.GetCurrentRadar());
+		if (m_SEGMentEngine.GetCurrentRadar() == true){
+			m_disableRadar = false;
+		}
 	
 
 		if (m_backgroundDisplay != null) {
