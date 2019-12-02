@@ -9,6 +9,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System;
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -37,11 +38,14 @@ public class SEGMentPath : MonoBehaviour {
 	public string m_UIElementsDirectoryName = "UI/";
 	public string m_titleLoadingImageName = "TitleLoading.png";
 
+    StreamWriter writer = new StreamWriter("./debug.txt", true);
+
+    string m_envGameFolder = Environment.GetEnvironmentVariable("SEGMENT_GAME_FOLDER");
+    string m_envGameFile = Environment.GetEnvironmentVariable("SEGMENT_GAME_FILE");
 
 	void Awake () {		
 		if (instance == null) {
 			instance = this;
-
 			StartCoroutine(GeneratePath());
 		} else {
 			Destroy(gameObject);
@@ -73,7 +77,6 @@ public class SEGMentPath : MonoBehaviour {
 
 		
 
-
 #if UNITY_STANDALONE_OSX || UNITY_EDITOR_OSX
 		//	#if !UNITY_EDITOR
 		m_applicationPath = "file:///" + m_applicationPath;
@@ -86,6 +89,8 @@ public class SEGMentPath : MonoBehaviour {
 			yield return null;
 		}
 			
+		// writer.WriteLine(" loading : " + GetSEGMentDiagramPath());
+		// writer.Flush();
 
 		if (testWWW.error != null) {
 
@@ -146,17 +151,22 @@ public class SEGMentPath : MonoBehaviour {
         // writer.Flush();
     }
 		
-
-	public string GetSEGMentPath() {
-		return m_applicationPath;
-	}
-
 	public string GetSEGMentGameDataPath() {
-		return Path.Combine(m_applicationPath, m_gameDataDirectoryName);
+        if(m_envGameFolder is null)
+          return Path.Combine(m_applicationPath, m_gameDataDirectoryName);
+	    else
+		  return m_envGameFolder;
+		  
 	}
 
 	public string GetSEGMentDiagramPath() {
-		return Path.Combine(GetSEGMentGameDataPath(), m_gameStructureRootFileName);
+		// For instance : 
+		// - GetSEGMentGameDataPath() == /home/jcelerier/segment/segment-game/game/
+		// - m_gameStructureRootFileName == Game.segment
+		if(m_envGameFile is null) 
+		  return Path.Combine(GetSEGMentGameDataPath(), m_gameStructureRootFileName);
+		else
+		  return m_envGameFile;
 	}
 
 	public string GetSoundPath() {

@@ -9,6 +9,7 @@ using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
+using System;
 using UnityEngine;
 
 
@@ -497,15 +498,18 @@ namespace SEGMent
 
         IEnumerator LoadJSON(Player playerToSet)
         {
-            Debug.Log(m_rootFileName);
+            Debug.Log("LoadJSON: " + m_rootFileName);
             var loader = new SEGMent.Json.LoadJson();
+
+			WWW xmlwww;
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
             if (m_rootFileName.StartsWith("file:///"))
                 m_rootFileName = m_rootFileName.Remove(0, 8);
 #endif
             m_fileSystemTimeWhenLoaded = File.GetLastWriteTime(m_rootFileName);
 
-			WWW xmlwww = new WWW(m_rootFileName);
+			xmlwww = new WWW(m_rootFileName);
+
 			while (!xmlwww.isDone) {
 				yield return null;
 			}
